@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Auth;
+namespace App\Http\Controllers\Api\Auth;
 
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -16,10 +16,18 @@ class LoginController extends Controller
      */
     public function __invoke(LoginRequest $request)
     {
-        if (!auth()->attempt($request->only('email', 'password'))) {
+        $user = User::where('email', $request->email)->first();
+
+        if(!$user || !Hash::check($request->password, $user->password)){
             throw ValidationException::withMessages([
                 'email' => ['The provided credentials are incorrect.'],
             ]);
         }
+
+        return response()->json([
+            'user' => $user,
+            'token' => $user->createToken('laravel_api_token')->plainTextToken
+        ]);
+
     }
 }
