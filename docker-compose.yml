@@ -1,0 +1,33 @@
+version: '3.7'
+
+services:
+  web:
+    build: .
+    ports:
+      - "9091:80"
+    image: laravel-vue-fpm
+    container_name: laravel-vue-fpm-app
+    extra_hosts:
+      - "192.168.2.226:192.168.2.226"
+      - "192.168.2.32:192.168.2.32"
+      - "192.168.2.97:192.168.2.97"
+      - "192.168.2.218:192.168.2.218"
+      - host.docker.internal:host-gateway
+    volumes:
+      - .:/var/www/html/aims
+  redis:
+        image: 'redis:alpine'
+        ports:
+            - '6379:6379'
+        volumes:
+            - 'sail-redis:/data'
+        healthcheck:
+            test:
+                - CMD
+                - redis-cli
+                - ping
+            retries: 3
+            timeout: 5s
+volumes:
+    sail-redis:
+        driver: local
